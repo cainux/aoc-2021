@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# 
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BA90909E-7A6E-41A2-99C2-FAD7E06F4124}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dec_01", "src\Dec_01\Dec_01.csproj", "{D59A7E1D-D9AE-4B83-B974-9C115FDDE76F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dec_02", "src\Dec_02\Dec_02.csproj", "{C8B3F510-2169-442E-BFD3-EAC2A317A60A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D59A7E1D-D9AE-4B83-B974-9C115FDDE76F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D59A7E1D-D9AE-4B83-B974-9C115FDDE76F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D59A7E1D-D9AE-4B83-B974-9C115FDDE76F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D59A7E1D-D9AE-4B83-B974-9C115FDDE76F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8B3F510-2169-442E-BFD3-EAC2A317A60A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8B3F510-2169-442E-BFD3-EAC2A317A60A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8B3F510-2169-442E-BFD3-EAC2A317A60A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8B3F510-2169-442E-BFD3-EAC2A317A60A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D59A7E1D-D9AE-4B83-B974-9C115FDDE76F} = {BA90909E-7A6E-41A2-99C2-FAD7E06F4124}
+		{C8B3F510-2169-442E-BFD3-EAC2A317A60A} = {BA90909E-7A6E-41A2-99C2-FAD7E06F4124}
+	EndGlobalSection
+EndGlobal
