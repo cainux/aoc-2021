@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 
@@ -7,7 +8,7 @@ namespace Dec_04
 {
     class Program
     {
-        class Cell
+        struct Cell
         {
             public int value;
             public bool marked;
@@ -43,6 +44,8 @@ namespace Dec_04
             }
 
             Part01(draw, boards);
+            Console.WriteLine();
+            Part02(draw, boards);
         }
 
         static void MarkMatches(int value, Cell[,] board)
@@ -57,9 +60,11 @@ namespace Dec_04
         {
             for (var i = 0; i < 5; i++)
             {
-                var row = Enumerable.Range(0, 5).Select(x => board[i, x]).Where(x => x.marked).ToArray();
-                var col = Enumerable.Range(0, 5).Select(x => board[x, i]).Where(x => x.marked).ToArray();
-                if (row.Length != 5 && col.Length != 5) continue;
+                var rowSlice = Enumerable.Range(0, 5).Select(x => board[i, x]).Where(x => x.marked).ToArray();
+                var colSlice = Enumerable.Range(0, 5).Select(x => board[x, i]).Where(x => x.marked).ToArray();
+
+                if (rowSlice.Length != 5 && colSlice.Length != 5) continue;
+
                 return true;
             }
 
@@ -82,8 +87,30 @@ namespace Dec_04
             foreach (var board in boards)
             {
                 MarkMatches(number, board);
+
                 if (!HasWon(board)) continue;
+
                 Console.WriteLine($"Number drawn: {number}, Final score: {number * GetUnmarked(board).Sum()}");
+                return;
+            }
+        }
+
+        static void Part02(int[] draw, IList<Cell[,]> boards)
+        {
+            var winners = new Collection<Cell[,]>();
+
+            foreach (var number in draw)
+            foreach (var board in boards)
+            {
+                MarkMatches(number, board);
+
+                if (!HasWon(board) || winners.Contains(board)) continue;
+
+                winners.Add(board);
+
+                if (winners.Count != boards.Count) continue;
+
+                Console.WriteLine($"Last number drawn: {number}, Final score: {number * GetUnmarked(board).Sum()}");
                 return;
             }
         }
