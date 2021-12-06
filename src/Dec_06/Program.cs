@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 
 namespace Dec_06
 {
@@ -10,44 +10,36 @@ namespace Dec_06
         static void Main(string[] args)
         {
             var input = File.ReadAllText("input.txt");
-            var fishes = input.Split(',').Select(x => Convert.ToInt32(x)).ToArray();
+            var initial = input.Split(',').Select(x => Convert.ToUInt16(x)).ToArray();
 
-            Run(fishes, 80);
-        }
+            var fishCounters = new BigInteger[9];
 
-        static void Run(int[] fishes, int days)
-        {
-            for (var i = 0; i < days; i++)
+            for (var i = 0; i < fishCounters.Length; i++)
             {
-                fishes = Tick(fishes);
+                fishCounters[i] = initial.Count(x => x == i);
             }
 
-            Console.WriteLine($"After {days} Days: {fishes.Length}");
-        }
-
-        static int[] Tick(int[] fishes)
-        {
-            var babies = new List<int>();
-
-            for (var i = 0; i < fishes.Length; i++)
+            for (var d = 1; d <= 256; d++)
             {
-                fishes[i]--;
+                var zeroes = fishCounters[0];
 
-                if (fishes[i] < 0)
+                for (var i = 0; i < fishCounters.Length - 1; i++)
                 {
-                    babies.Add(8);
-                    fishes[i] = 6;
+                    fishCounters[i] = fishCounters[i + 1];
+                }
+
+                fishCounters[8] = 0;
+
+                if (zeroes > 0)
+                {
+                    fishCounters[6] += zeroes;
+                    fishCounters[8] = zeroes;
                 }
             }
 
-            var result = fishes.ToList();
+            var result = fishCounters.Aggregate(BigInteger.Zero, (current, fishCounter) => current + fishCounter);
 
-            if (babies.Any())
-            {
-                result.AddRange(babies);
-            }
-
-            return result.ToArray();
+            Console.WriteLine($"Result: {result}");
         }
     }
 }
