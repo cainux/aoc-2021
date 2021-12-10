@@ -1,17 +1,17 @@
 ﻿var lines = File.ReadLines("input.txt");
-var input = new List<(string[], string[])>();
+var inputData = new List<(string[], string[])>();
 
 foreach (var line in lines)
 {
     var entry = line.Split('|');
-    var signal = entry[0].Split(' ', StringSplitOptions.RemoveEmptyEntries);
-    var output = entry[1].Split(' ', StringSplitOptions.RemoveEmptyEntries);
-    input.Add((signal, output));
+    var signal = entry[0].Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(x => x.Ordered()).ToArray();
+    var output = entry[1].Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(x => x.Ordered()).ToArray();
+    inputData.Add((signal, output));
 }
 
-Part01(input); // Test: 26
+Part01(inputData); // Test: 26
 Console.WriteLine();
-Part02(input); // Test: 61229
+Part02(inputData); // Test: 61229
 
 void Part01(List<(string[], string[])> input)
 {
@@ -23,25 +23,17 @@ void Part01(List<(string[], string[])> input)
 
         foreach (var pattern in signal)
         {
-            var ordered = string.Join(string.Empty, pattern.OrderBy(x => x));
-
             _ = pattern.Length switch
             {
-                2 => numbers[ordered] = 1,
-                4 => numbers[ordered] = 4,
-                3 => numbers[ordered] = 7,
-                7 => numbers[ordered] = 8,
+                2 => numbers[pattern] = 1,
+                4 => numbers[pattern] = 4,
+                3 => numbers[pattern] = 7,
+                7 => numbers[pattern] = 8,
                 _ => 0
             };
         }
 
-        foreach (var pattern in output)
-        {
-            var ordered = string.Join(string.Empty, pattern.OrderBy(x => x));
-
-            if (numbers.ContainsKey(ordered))
-                result++;
-        }
+        result += output.Count(pattern => numbers.ContainsKey(pattern));
     }
 
     Console.WriteLine($"Part 1 result: {result}");
@@ -53,20 +45,16 @@ void Part02(List<(string[], string[])> input)
 
     foreach (var (signal, output) in input)
     {
-        var orderedPatterns = signal
-            .Select(x => string.Join(string.Empty, x.OrderBy(y => y)))
-            .ToArray();
-
         // 🤮
-        var one = orderedPatterns.Single(x => x.Length == 2);
-        var four = orderedPatterns.Single(x => x.Length == 4);
-        var seven = orderedPatterns.Single(x => x.Length == 3);
-        var eight = orderedPatterns.Single(x => x.Length == 7);
+        var one = signal.Single(x => x.Length == 2);
+        var four = signal.Single(x => x.Length == 4);
+        var seven = signal.Single(x => x.Length == 3);
+        var eight = signal.Single(x => x.Length == 7);
         var top = seven.Minus(one);
-        var nine = orderedPatterns.Single(x => x.Length == 6 && x.Has(four.Combine(top)));
+        var nine = signal.Single(x => x.Length == 6 && x.Has(four.Combine(top)));
         var bottom = nine.Minus(four.Combine(top));
         var bottomLeft = eight.Minus(nine);
-        var two = orderedPatterns.Single(x => x.Length == 5 && x.Combine(bottomLeft) == x);
+        var two = signal.Single(x => x.Length == 5 && x.Combine(bottomLeft) == x);
         var topLeft = nine.Minus(two).Minus(one).Minus(bottom);
         var zero = seven.Combine(topLeft).Combine(bottomLeft).Combine(bottom);
         var bottomRight = zero.Minus(two).Minus(topLeft);
@@ -89,9 +77,7 @@ void Part02(List<(string[], string[])> input)
             { nine, '9' }
         };
 
-        var outputValue = output
-            .Select(x => string.Join(string.Empty, x.OrderBy(y => y)))
-            .Aggregate(string.Empty, (current, o) => current + decoder[o]);
+        var outputValue = output.Aggregate(string.Empty, (current, o) => current + decoder[o]);
 
         result += Convert.ToInt32(outputValue);
     }
@@ -101,6 +87,11 @@ void Part02(List<(string[], string[])> input)
 
 static class Extensions
 {
+    public static string Ordered(this string x)
+    {
+        return string.Join(string.Empty, x.OrderBy(y => y));
+    }
+
     public static string Combine(this string x, string y)
     {
         return string.Join(string.Empty, (x + y).OrderBy(c => c).Distinct());
