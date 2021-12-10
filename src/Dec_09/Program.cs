@@ -23,16 +23,23 @@ static void Part01(int[,] area)
     for (var c = 0; c <= cols; c++)
     {
         var current = area[r, c];
-        var adjacent = new List<int>();
-
-        if (r > 0) adjacent.Add(area[r - 1, c]);
-        if (r < rows) adjacent.Add(area[r + 1, c]);
-        if (c > 0) adjacent.Add(area[r, c - 1]);
-        if (c < cols) adjacent.Add(area[r, c + 1]);
+        var adjacent = GetAdjacent(r, c, area, rows, cols);
 
         if (adjacent.All(a => a > current))
             lowPoints.Add(current);
     }
 
     Console.WriteLine($"Part 1 result: {lowPoints.Sum(x => x + 1)}");
+}
+
+static List<int> GetAdjacent(int r, int c, int[,] area, int rows, int cols)
+{
+    var result = new List<int>();
+
+    if (r > 0) result.Add(area[r - 1, c]);
+    if (r < rows) result.Add(area[r + 1, c]);
+    if (c > 0) result.Add(area[r, c - 1]);
+    if (c < cols) result.Add(area[r, c + 1]);
+
+    return result;
 }
