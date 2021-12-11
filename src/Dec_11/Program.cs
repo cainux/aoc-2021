@@ -5,8 +5,9 @@ for (var y = 0; y < lines.Length; y++)
 for (var x = 0; x < lines[y].Length; x++)
     input[x, y] = new Octopus(x, y, int.Parse(lines[y][x].ToString()));
 
-Part01(input); // Test: 1656
-Console.WriteLine();
+// Part01(input); // Test: 1656
+// Console.WriteLine();
+Part02(input); // Test: 195
 
 static void Part01(Octopus[,] area)
 {
@@ -30,6 +31,36 @@ static void Part01(Octopus[,] area)
     }
 
     Console.WriteLine($"Part 1 result: {result}");
+}
+
+static void Part02(Octopus[,] area)
+{
+    Console.WriteLine("Before any steps:");
+    Dump(area);
+
+    var step = 1;
+
+    while (true)
+    {
+        foreach (var octopus in area)
+        {
+            if (octopus.F) continue;
+            if (++octopus.V > 9)
+                Flash(octopus, area);
+        }
+
+        Console.WriteLine($"After step {step}:");
+        Dump(area);
+
+        if (AllFlashing(area))
+        {
+            Console.WriteLine($"Part 2 result: {step}");
+            return;
+        }
+
+        _ = CountAndReset(area);
+        step++;
+    }
 }
 
 static void Dump(Octopus[,] area)
@@ -106,6 +137,16 @@ static List<Octopus> GetNeighbours(Octopus octopus, Octopus[,] area)
 static (int rows, int cols) GetDimensions(Octopus[,] area)
 {
     return (area.GetUpperBound(0), area.GetUpperBound(1));
+}
+
+static bool AllFlashing(Octopus[,] area)
+{
+    foreach (var octopus in area)
+    {
+        if (!octopus.F)
+            return false;
+    }
+    return true;
 }
 
 internal record Location(int X, int Y);
