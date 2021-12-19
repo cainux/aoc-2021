@@ -19,7 +19,7 @@ static void Run(string template, IReadOnlyDictionary<string, char> rules, int st
     {
         var nextStep = new Dictionary<string, ulong>();
 
-        foreach (var (pair, count) in pairs.Where(x => x.Value > 0))
+        foreach (var (pair, count) in pairs)
         {
             if (!rules.ContainsKey(pair)) continue;
 
