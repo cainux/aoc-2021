@@ -9,30 +9,32 @@ for (var y = 0; y < lines.Length; y++)
 for (var x = 0; x < lines[y].Length; x++)
     cavern[x, y] = new Chiton(x, y, int.Parse(lines[y][x].ToString()));
 
-Run(cavern); // Test: 40
+var actualCavern = Expand(cavern, 5);
+
+Run(actualCavern); // Test pt1: 40 pt2: 315
 
 static void Run(Chiton[,] cavern)
 {
-    var (mx, my) = GetDimensions(cavern);
+    var (mx, my) = GetBounds(cavern);
     var goal = cavern[mx, my];
 
     var start = new Path(cavern[0, 0].L, 0, 0);
 
-    var open = new List<Path>(new[] {start});
-    var closed = new List<Path>();
+    var open = new Dictionary<Location, Path> {[start.L] = start};
+    var closed = new Dictionary<Location, Path>();
 
     while (open.Count > 0)
     {
-        var q = open.MinBy(x => x.F)!;
+        var q = open.MinBy(x => x.Value.F).Value;
         var successors = GetNeighbours(q.L, cavern);
 
         foreach (var successor in successors)
         {
             if (successor == goal)
             {
-                Console.WriteLine("Goal reached:");
+                // Console.WriteLine("Goal reached:");
                 q.Route.Add(successor);
-                Draw(cavern, q);
+                // Draw(cavern, q);
                 Console.WriteLine($"Result: {q.Route.Sum(x => x.Risk)}");
                 return;
             }
@@ -41,26 +43,62 @@ static void Run(Chiton[,] cavern)
             var h = H(successor, goal);
             var f = g + h;
 
-            if (open.Any(x => x.L == successor.L && x.F <= f)) continue;
-            if (closed.Any(x => x.L == successor.L && x.F <= f)) continue;
+            if (open.ContainsKey(successor.L) && open[successor.L].F <= f) continue;
+            if (closed.ContainsKey(successor.L) && closed[successor.L].F <= f) continue;
 
             var p = new Path(successor.L, f, g);
 
             p.Route.AddRange(q.Route);
             p.Route.Add(successor);
 
-            open.Add(p);
+            open[p.L] = p;
         }
 
-        open.Remove(q);
-        closed.Add(q);
+        open.Remove(q.L);
+        closed[q.L] = q;
     }
+}
+
+static Chiton[,] Expand(Chiton[,] cavern, int repeat)
+{
+    var (mx, my) = GetBounds(cavern);
+    var sizeX = mx + 1;
+    var sizeY = my + 1;
+    var newCavern = new Chiton[sizeX * repeat, sizeY * repeat];
+
+    for (var y = 0; y <= my; y++)
+    for (var x = 0; x <= mx; x++)
+    {
+        newCavern[x, y] = new Chiton(x, y, cavern[x, y].Risk);
+    }
+
+    for (var y = 0; y < sizeY * repeat; y++)
+    for (var x = 0; x < sizeX * repeat; x++)
+    {
+        if (x <= mx && y <= my) continue;
+
+        var newRisk = 0;
+
+        if (x > mx)
+            newRisk = newCavern[x - sizeX, y].Risk;
+        else if (y > my)
+            newRisk = newCavern[x, y - sizeY].Risk;
+
+        newRisk++;
+
+        if (newRisk > 9)
+            newRisk = 1;
+
+        newCavern[x, y] = new Chiton(x, y, newRisk);
+    }
+
+    return newCavern;
 }
 
 static List<Chiton> GetNeighbours(Location location, Chiton[,] cavern)
 {
     var result = new List<Chiton>();
-    var (rows, cols) = GetDimensions(cavern);
+    var (rows, cols) = GetBounds(cavern);
     var (x, y) = location;
 
     var startX = x > 0 ? x - 1 : x;
@@ -76,7 +114,7 @@ static List<Chiton> GetNeighbours(Location location, Chiton[,] cavern)
     return result;
 }
 
-static (int mx, int my) GetDimensions<T>(T[,] c) => (c.GetUpperBound(0), c.GetUpperBound(1));
+static (int mx, int my) GetBounds<T>(T[,] c) => (c.GetUpperBound(0), c.GetUpperBound(1));
 
 static int H(Chiton c, Chiton g) => ManhattanDistance(c, g);
 
@@ -84,7 +122,7 @@ static int ManhattanDistance(Chiton current, Chiton goal) => Math.Abs(current.L.
 
 static void Draw(Chiton[,] cavern, Path path)
 {
-    var (mx, my) = GetDimensions(cavern);
+    var (mx, my) = GetBounds(cavern);
 
     var originalColour = Console.ForegroundColor;
 
